@@ -1,0 +1,92 @@
+#!/bin/bash
+
+# FLAGS:
+# -t <title> : set the message title
+# -u <user_key>: pushover user key (override USER_KEY)
+# -a <app_key>: pushover app key (override APP_KEY)
+# -s <sound>: pushover sound (override SOUND)
+# -d: debug mode or dryrun. No message sent 
+
+
+
+# DEFAULT VALUES
+####################
+
+# Default user Key
+USER_KEY=""
+
+# Default application token 
+APP_TOKEN=""
+
+# Default sound
+SOUND="pushover"
+
+# Default message if no message is provided
+DEFAULT_MESSAGE="Shell Message"
+
+# Message max length
+MSG_MAX_LENGTH=1024
+
+
+TIMESTAMP=$(date +%s)
+PROG_NAME=$(basename $0)
+
+
+if [ ! -t 0 ]; then
+	STDINPUT=$(cat)
+fi
+
+
+if [ $# -gt  0 ]
+then
+        while getopts ":dht:u:a:s:" OPTION
+        do
+                case ${OPTION} in
+                t) TITLE=$OPTARG;;
+		u) USER_KEY=$OPTARG;;
+		a) APP_TOKEN=$OPTARG;;
+		s) SOUND=$OPTARG;;
+		d) DEBUG=1;;
+                h | \?) echo "Usage: ${PROG_NAME} [ -i -t title -u user_key -a app_key -s sound ] [message]"
+                        echo "example: ${PROG_NAME} hello world"
+                        exit 2;;
+                esac
+        done
+
+        shift $(($OPTIND - 1))
+        if [ $# -gt  0 ]
+        then
+         	MESSAGE=$@
+        fi
+fi
+
+if [ -n "$STDINPUT" ]
+then
+	MSG=$STDINPUT
+else 
+	MSG=${MESSAGE:-$DEFAULT_MESSAGE}
+fi
+
+COMMAND="curl -s \
+	--form-string \"token=$APP_TOKEN\" \
+	--form-string \"user=$USER_KEY\" \
+	--form-string \"title=$TITLE\" \
+	--form-string \"message=${MSG:0:$MSG_MAX_LENGTH}\" \
+	--form-string \"sound=$SOUND\" \
+	--form-string \"timestamp=$TIMESTAMP\" \
+	https://api.pushover.net/1/messages.json"
+
+if [ ! -n "$DEBUG" ]
+then
+	RESULT=$(eval "$COMMAND")
+	STATUS=$(echo $RESULT | sed -e 's/[{}]/''/g' | awk -F':' -v RS="," '/^"status"/ {print $2}')
+	if [ $STATUS -eq 1 ] 
+	then 
+		exit 0	
+	else 
+		echo $RESULT
+		exit 1 
+	fi
+else
+	echo $COMMAND
+fi
