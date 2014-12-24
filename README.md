@@ -9,14 +9,13 @@ pushover [ -t <title> -u <user_key> -a <app_token> -s <sound> ] [message]
  
 Flags: 
 
- * -t title: add a title to the message
- * -u user_key: ovverride ``USER_KEY`` variable. This mandatory if ``USER_KEY`` is empty
- * -a app_token: ovverride ``APP_TOKEN`` variable. This mandatory if ``APP_TOKEN`` is empty
+ * -t title: add a message title 
+ * -u user_key: ovverride ``USER_KEY`` variable. This is mandatory if ``USER_KEY`` is empty
+ * -a app_token: ovverride ``APP_TOKEN`` variable. This is mandatory if ``APP_TOKEN`` is empty
  * -s sound: specify the sound to use for your message (default sound: pushover)
  * -d: dryrun
 
-The message is optional, if empty the value of ``DEFAULT_MESSAGE`` variable is sent (default: "Shell Message")
-	
+The message is optional: if empty the value of ``DEFAULT_MESSAGE`` variable is sent (default: "Shell Message")
 	
 
 ## Examples
@@ -31,11 +30,8 @@ If ``USER_KEY`` and ``APP_TOKEN`` variables are not empty you can omit "-u" and 
 pushover this is my message
 ```
 
-You can redirect command standard ouput to a pushover message:
+You can send message with command standard output: 
 
 ```bash
-echo "this is the output of my command" | pushover
+echo "this is the output of my command" | pushover -t "Long command complete"
 ```
-
-
-
