@@ -47,7 +47,7 @@ then
 		a) APP_TOKEN=$OPTARG;;
 		s) SOUND=$OPTARG;;
 		d) DEBUG=1;;
-                h | \?) echo "Usage: ${PROG_NAME} [ -i -t title -u user_key -a app_key -s sound ] [message]"
+                h | \?) echo "Usage: ${PROG_NAME} [ -t <title> -u <user_key> -a <app_token> -s <sound> ] [message]"
                         echo "example: ${PROG_NAME} hello world"
                         exit 2;;
                 esac
